@@ -1,0 +1,43 @@
+services:
+  nginx:
+    build:
+      context: ./
+      dockerfile: docker/nginx.docker
+    volumes:
+      - ./:/var/www
+    ports:
+      - "8080:80"
+    depends_on:
+      - php-fpm
+
+  php-fpm:
+    build:
+      context: ./
+      dockerfile: docker/php-fpm.docker
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${DBUSER}:${DBPASSWORD}@postgres_db:5432/${DBNAME}?serverVersion=16&charset=utf8
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - postgres_db
+
+  postgres_db:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${DBNAME}
+      POSTGRES_PASSWORD: ${DBPASSWORD}
+      POSTGRES_USER: ${DBUSER}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${DBNAME}", "-U", "${DBUSER}"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+
+volumes:
+  database_data:
