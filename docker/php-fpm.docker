@@ -35,6 +35,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 RUN docker-php-source delete
 
+RUN git config --global --add safe.directory /var/www
+
 WORKDIR /var/www
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
