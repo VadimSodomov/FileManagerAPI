@@ -20,3 +20,8 @@ docker compose up -d
 ```shell
 docker compose down
 ```
+
+Фронт:
+```shell
+npm install ; npm run dev
+```
