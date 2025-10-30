@@ -7,8 +7,8 @@ fi
 
 if [ ! -d public/uploads ]; then
     mkdir -p public/uploads/trainer
-    chown -R www-data:www-data var public/uploads config/jwt
-    chmod -R 775 var public/uploads config/jwt
+    chown -R www-data:www-data public/uploads config/jwt
+    chmod -R 775 public/uploads config/jwt
 fi
 
 if [ ! -f config/jwt/private.pem ] || [ ! -f config/jwt/public.pem ]; then
