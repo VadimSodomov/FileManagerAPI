@@ -1,7 +1,7 @@
 services:
   nginx:
     build:
-      context: ..
+      context: ./
       dockerfile: docker/nginx.docker
     volumes:
       - ./:/var/www
@@ -12,7 +12,7 @@ services:
 
   php-fpm:
     build:
-      context: ..
+      context: ./
       dockerfile: docker/php-fpm.docker
     env_file:
       - .env
