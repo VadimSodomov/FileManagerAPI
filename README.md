@@ -8,12 +8,12 @@
 Бэк нужно запускать из директории `backend`
 Первый запуск:
 ```shell
-docker compose up --build -d
+docker compose up --build
 ```
 
 Последующие запуски:
 ```shell
-docker compose up -d
+docker compose up
 ```
 
 После этого API будет доступно по http://127.0.0.1:8080/api/.
