@@ -6,7 +6,7 @@ namespace App\DTO;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-readonly class AuthDTO
+class AuthDTO
 {
     #[Assert\NotBlank(message: 'Email обязателен для заполнения')]
     #[Assert\Type('string')]
