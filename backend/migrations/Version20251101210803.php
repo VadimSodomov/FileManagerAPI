@@ -16,7 +16,7 @@ final class Version20251101210803 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE folder (id SERIAL NOT NULL, user_id BIGINT NOT NULL, parent_id BIGINT DEFAULT NULL, name TEXT NOT NULL, is_root BOOLEAN NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE folder (id SERIAL NOT NULL, user_id BIGINT NOT NULL, parent_id BIGINT DEFAULT NULL, name TEXT NOT NULL, is_root BOOLEAN NOT NULL DEFAULT false, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_ECA209CDA76ED395 ON folder (user_id)');
         $this->addSql('CREATE INDEX IDX_ECA209CD727ACA70 ON folder (parent_id)');
         $this->addSql('ALTER TABLE folder ADD CONSTRAINT FK_ECA209CDA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE');
