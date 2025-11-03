@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\FolderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -33,9 +35,16 @@ class Folder
     #[ORM\Column]
     private ?\DateTime $cdate = null;
 
+    /**
+     * @var Collection<int, File>
+     */
+    #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'folder')]
+    private Collection $files;
+
     public function __construct()
     {
         $this->cdate = new \DateTime(timezone: new \DateTimeZone('Europe/Moscow'));
+        $this->files = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -93,6 +102,33 @@ class Folder
     public function setCdate(\DateTime $cdate): static
     {
         $this->cdate = $cdate;
+
+        return $this;
+    }
+
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(File $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+            $file->setFolder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(File $file): static
+    {
+        if ($this->files->removeElement($file)) {
+            // set the owning side to null (unless already changed)
+            if ($file->getFolder() === $this) {
+                $file->setFolder(null);
+            }
+        }
 
         return $this;
     }
