@@ -6,7 +6,7 @@ if [ ! -d config/jwt ]; then
 fi
 
 if [ ! -d public/uploads ]; then
-    mkdir -p public/uploads/trainer
+    mkdir -p public/uploads
     chown -R www-data:www-data public/uploads config/jwt
     chmod -R 775 public/uploads config/jwt
 fi
