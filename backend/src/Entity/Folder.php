@@ -7,6 +7,7 @@ namespace App\Entity;
 use App\Repository\FolderRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: FolderRepository::class)]
 class Folder
@@ -25,11 +26,17 @@ class Folder
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column]
-    private ?bool $is_root = null;
-
+    #[Ignore]
     #[ORM\ManyToOne(targetEntity: self::class)]
     private ?self $parent = null;
+
+    #[ORM\Column]
+    private ?\DateTime $cdate = null;
+
+    public function __construct()
+    {
+        $this->cdate = new \DateTime(timezone: new \DateTimeZone('Europe/Moscow'));
+    }
 
     public function getId(): ?int
     {
@@ -60,18 +67,6 @@ class Folder
         return $this;
     }
 
-    public function isRoot(): ?bool
-    {
-        return $this->is_root;
-    }
-
-    public function setIsRoot(bool $is_root): static
-    {
-        $this->is_root = $is_root;
-
-        return $this;
-    }
-
     public function getParent(): ?self
     {
         return $this->parent;
@@ -87,7 +82,18 @@ class Folder
     public static function createRootFolder(User $user): Folder
     {
         return new self()->setUser($user)
-            ->setIsRoot(true)
             ->setName(self::ROOT_NAME_DEFAULT);
+    }
+
+    public function getCdate(): ?string
+    {
+        return $this->cdate?->format('Y-m-d H:i:s');
+    }
+
+    public function setCdate(\DateTime $cdate): static
+    {
+        $this->cdate = $cdate;
+
+        return $this;
     }
 }
