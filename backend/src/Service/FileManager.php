@@ -32,7 +32,7 @@ class FileManager
         }
 
         $file = new File()
-            ->setServerName($fileName)
+            ->setServerName("$userDirectory/$fileName")
             ->setName($uploadedFile->getClientOriginalName())
             ->setMimeType($uploadedFile->getMimeType() ?: 'application/octet-stream')
             ->setSize($uploadedFile->getSize())

@@ -82,4 +82,24 @@ final class FolderController extends BaseController
             'content' => $foldersByParent,
         ]);
     }
+
+    #[Route(
+        '/api/folder/{folder}',
+        name: 'api_folder_get',
+        requirements: ['folder' => '\d+'],
+        methods: ['GET']
+    )]
+    public function getFolder(Folder $folder): JsonResponse
+    {
+        if ($folder->getUser()->getId() !== $this->getCurrentUser()->getId()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $childFolders = $this->folderRepository->findBy(['parent' => $folder]);
+
+        return $this->json([
+            'folder' => $folder,
+            'childFolders' => $childFolders,
+        ]);
+    }
 }
