@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\FileRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
@@ -41,6 +42,9 @@ class File
     #[ORM\ManyToOne(inversedBy: 'files')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Folder $folder = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $code = null;
 
     public function __construct()
     {
@@ -133,6 +137,18 @@ class File
     public function setFolder(?Folder $folder): static
     {
         $this->folder = $folder;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }

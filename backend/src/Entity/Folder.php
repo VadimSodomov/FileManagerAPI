@@ -41,6 +41,9 @@ class Folder
     #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'folder')]
     private Collection $files;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $code = null;
+
     public function __construct()
     {
         $this->cdate = new \DateTime(timezone: new \DateTimeZone('Europe/Moscow'));
@@ -129,6 +132,18 @@ class Folder
                 $file->setFolder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }
