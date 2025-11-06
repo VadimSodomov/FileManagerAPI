@@ -46,9 +46,9 @@ readonly class FileManager
         return $file;
     }
 
-    public function delete(File $file): void
+    public function delete(string $fileName): void
     {
-        $filePath = $this->targetDirectory . '/' . $file->getServerName();
+        $filePath = $this->targetDirectory . '/' . $fileName;
 
         if (file_exists($filePath)) {
             unlink($filePath);

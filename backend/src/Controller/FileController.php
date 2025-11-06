@@ -115,7 +115,7 @@ final class FileController extends BaseController
         }
 
         foreach ($files as $file) {
-            $this->fileManager->delete($file);
+            $this->fileManager->delete($file->getServerName());
 
             $this->entityManager->remove($file);
         }
