@@ -8,6 +8,7 @@
 /var/
 /vendor/
 /public/uploads/
+compose.override.yml
 
 .env
 .idea
