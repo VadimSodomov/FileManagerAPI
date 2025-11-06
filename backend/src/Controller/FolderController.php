@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\DTO\FolderDTO;
 use App\Entity\Folder;
+use App\Helper\HashHelper;
 use App\Repository\FileRepository;
 use App\Repository\FolderRepository;
 use App\Service\FileManager;
@@ -159,5 +160,30 @@ final class FolderController extends BaseController
             'folder' => $folder,
             'childFolders' => $childFolders,
         ]);
+    }
+
+    #[Route(
+        '/api/folder/share/{folder}',
+        name: 'api_folder_share',
+        requirements: ['folder' => '\d+'],
+        methods: ['POST']
+    )]
+    public function share(Folder $folder): JsonResponse
+    {
+        if ($folder->getUser()->getId() !== $this->getCurrentUser()->getId()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $codeCdate = new \DateTime(timezone: new \DateTimeZone('Europe/Moscow'));
+
+        $hash = HashHelper::hash($folder->getName() . $codeCdate->getTimestamp());
+
+        $folder->setCode($hash);
+        $folder->setCodeCdate($codeCdate);
+
+        $this->entityManager->persist($folder);
+        $this->entityManager->flush();
+
+        return $this->json(['code' => $hash]);
     }
 }

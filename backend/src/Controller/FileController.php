@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\File;
 use App\Entity\Folder;
+use App\Helper\HashHelper;
 use App\Repository\FileRepository;
 use App\Service\FileManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -123,5 +125,30 @@ final class FileController extends BaseController
         $this->entityManager->flush();
 
         return $this->json([], Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route(
+        '/api/files/share/{file}',
+        name: 'api_file_share',
+        requirements: ['file' => '\d+'],
+        methods: ['POST']
+    )]
+    public function share(File $file): JsonResponse
+    {
+        if ($file->getUser()->getId() !== $this->getCurrentUser()->getId()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $codeCdate = new \DateTime(timezone: new \DateTimeZone('Europe/Moscow'));
+
+        $hash = HashHelper::hash($file->getServerName() . $codeCdate->getTimestamp());
+
+        $file->setCode($hash);
+        $file->setCodeCdate($codeCdate);
+
+        $this->entityManager->persist($file);
+        $this->entityManager->flush();
+
+        return $this->json(['code' => $hash]);
     }
 }
