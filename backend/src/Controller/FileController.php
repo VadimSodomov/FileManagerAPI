@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Folder;
+use App\Repository\FileRepository;
 use App\Service\FileManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +18,7 @@ final class FileController extends BaseController
     public function __construct(
         readonly private EntityManagerInterface $entityManager,
         readonly private FileManager            $fileManager,
+        readonly private FileRepository         $fileRepository,
     )
     {
     }
@@ -89,5 +91,37 @@ final class FileController extends BaseController
         $statusCode = $uploadedCount > 0 ? Response::HTTP_CREATED : Response::HTTP_BAD_REQUEST;
 
         return $this->json($responseData, $statusCode);
+    }
+
+    #[Route(
+        '/api/files/delete',
+        name: 'api_file_delete',
+        methods: ['DELETE']
+    )]
+    public function deleteFile(Request $request): JsonResponse
+    {
+        $fileIds = $request->toArray()['file_ids'] ?? [];
+
+        if (empty($fileIds) || !is_array($fileIds)) {
+            return $this->json(['error' => 'Не выбрано ни одного файла'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $ids = array_map('intval', $fileIds);
+
+        $files = $this->fileRepository->findBy(['id' => $ids, 'user' => $this->getCurrentUser()]);
+
+        if (count($files) !== count($ids)) {
+            throw $this->createAccessDeniedException();
+        }
+
+        foreach ($files as $file) {
+            $this->fileManager->delete($file);
+
+            $this->entityManager->remove($file);
+        }
+
+        $this->entityManager->flush();
+
+        return $this->json([], Response::HTTP_NO_CONTENT);
     }
 }
