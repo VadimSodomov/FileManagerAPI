@@ -46,6 +46,10 @@ class File
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $code = null;
 
+    #[Ignore]
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $code_cdate = null;
+
     public function __construct()
     {
         $this->cdate = new \DateTime(timezone: new \DateTimeZone('Europe/Moscow'));
@@ -149,6 +153,19 @@ class File
     public function setCode(?string $code): static
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    #[Ignore]
+    public function getCodeCdate(): ?\DateTime
+    {
+        return $this->code_cdate;
+    }
+
+    public function setCodeCdate(?\DateTime $code_cdate): static
+    {
+        $this->code_cdate = $code_cdate;
 
         return $this;
     }
