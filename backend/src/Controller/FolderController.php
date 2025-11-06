@@ -6,7 +6,9 @@ namespace App\Controller;
 
 use App\DTO\FolderDTO;
 use App\Entity\Folder;
+use App\Repository\FileRepository;
 use App\Repository\FolderRepository;
+use App\Service\FileManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +19,8 @@ final class FolderController extends BaseController
 {
     public function __construct(
         readonly private FolderRepository       $folderRepository,
+        readonly private FileRepository         $fileRepository,
+        readonly private FileManager            $fileManager,
         readonly private EntityManagerInterface $entityManager,
     )
     {
@@ -55,6 +59,33 @@ final class FolderController extends BaseController
         $this->entityManager->flush();
 
         return $this->json($folder);
+    }
+
+    #[Route(
+        '/api/folder/{folder}',
+        name: 'api_folder_delete',
+        requirements: ['folder' => '\d+'],
+        methods: ['DELETE'])
+    ]
+    public function delete(Folder $folder): JsonResponse
+    {
+        if (
+            $folder->getUser()->getId() !== $this->getCurrentUser()->getId()
+            || $folder->getParent() === null
+        ) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $fileServerNames = $this->fileRepository->getFilesForDelete($folder->getId());
+
+        $this->entityManager->remove($folder);
+        $this->entityManager->flush();
+
+        foreach ($fileServerNames as $fileServerName) {
+            $this->fileManager->delete($fileServerName);
+        }
+
+        return $this->json([], Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/api/folder/root', name: 'api_folder_get_root', methods: ['GET'])]
