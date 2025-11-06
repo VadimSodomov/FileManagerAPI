@@ -170,7 +170,10 @@ final class FolderController extends BaseController
     )]
     public function share(Folder $folder): JsonResponse
     {
-        if ($folder->getUser()->getId() !== $this->getCurrentUser()->getId()) {
+        if (
+            $folder->getUser()->getId() !== $this->getCurrentUser()->getId()
+            || $folder->getParent() === null
+        ) {
             throw $this->createAccessDeniedException();
         }
 
