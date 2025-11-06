@@ -11,6 +11,7 @@ use App\Repository\FolderRepository;
 use App\Service\FileManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
@@ -54,6 +55,32 @@ final class FolderController extends BaseController
             ->setParent($parent)
             ->setUser($user)
             ->setName($folderDTO->name);
+
+        $this->entityManager->persist($folder);
+        $this->entityManager->flush();
+
+        return $this->json($folder);
+    }
+
+    #[Route(
+        '/api/folder/{folder}',
+        name: 'api_folder_update',
+        requirements: ['folder' => '\d+'],
+        methods: ['PUT'])
+    ]
+    public function update(Folder $folder, Request $request): JsonResponse
+    {
+        if ($folder->getUser()->getId() !== $this->getCurrentUser()->getId()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $newName = $request->toArray()['name'] ?? '';
+
+        if (!is_string($newName)) {
+            return $this->json('Некорректный формат названия папки', Response::HTTP_BAD_REQUEST);
+        }
+
+        $folder->setName($newName);
 
         $this->entityManager->persist($folder);
         $this->entityManager->flush();
