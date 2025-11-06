@@ -77,9 +77,9 @@ class File
         return $this;
     }
 
-    public function getCdate(): ?\DateTime
+    public function getCdate(): ?string
     {
-        return $this->cdate;
+        return $this->cdate?->format('Y-m-d H:i:s');
     }
 
     public function setCdate(\DateTime $cdate): static

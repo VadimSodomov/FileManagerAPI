@@ -10,11 +10,11 @@ use App\Entity\User;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class FileManager
+readonly class FileManager
 {
     public function __construct(
-        private readonly string           $targetDirectory,
-        private readonly SluggerInterface $slugger
+        private string           $targetDirectory,
+        private SluggerInterface $slugger
     )
     {
     }
@@ -26,9 +26,11 @@ class FileManager
 
         $fileName = $safeFilename . '-' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
 
-        $userDirectory = $this->targetDirectory . '/user_' . $user->getId();
-        if (!is_dir($userDirectory)) {
-            mkdir($userDirectory, 0777, true);
+        $userDirectory = 'user_' . $user->getId();
+
+        $directory = $this->targetDirectory . '/' . $userDirectory;
+        if (!is_dir($directory)) {
+            mkdir($directory, 0777, true);
         }
 
         $file = new File()
@@ -39,7 +41,7 @@ class FileManager
             ->setUser($user)
             ->setFolder($folder);
 
-        $uploadedFile->move($userDirectory, $fileName);
+        $uploadedFile->move($directory, $fileName);
 
         return $file;
     }
