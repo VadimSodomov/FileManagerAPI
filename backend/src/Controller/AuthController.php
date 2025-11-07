@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\DTO\AuthDTO;
+use App\Entity\Folder;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,7 +43,10 @@ final class AuthController extends AbstractController
         $user = new User();
         $user->assign($authDTO, $this->passwordHasher);
 
+        $rootFolder = Folder::createRootFolder($user);
+
         $this->entityManager->persist($user);
+        $this->entityManager->persist($rootFolder);
         $this->entityManager->flush();
 
         return $this->json(
