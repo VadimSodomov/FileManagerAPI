@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -148,9 +149,17 @@ final class FolderController extends BaseController
         requirements: ['folder' => '\d+'],
         methods: ['GET']
     )]
-    public function getFolder(Folder $folder): JsonResponse
+    public function getFolder(
+        Folder                       $folder,
+        #[MapQueryParameter] ?string $code
+    ): JsonResponse
     {
-        if ($folder->getUser()->getId() !== $this->getCurrentUser()->getId()) {
+        $accessPath = $code !== null ? $this->folderRepository->getAccessPathByCode($folder->getId(), $code) : null;
+
+        if (
+            $folder->getUser()->getId() !== $this->getCurrentUser()->getId()
+            && $accessPath === null
+        ) {
             throw $this->createAccessDeniedException();
         }
 
@@ -159,6 +168,7 @@ final class FolderController extends BaseController
         return $this->json([
             'folder' => $folder,
             'childFolders' => $childFolders,
+            'accessPath' => $accessPath,
         ]);
     }
 
