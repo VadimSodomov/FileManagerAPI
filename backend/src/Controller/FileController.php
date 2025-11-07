@@ -151,4 +151,25 @@ final class FileController extends BaseController
 
         return $this->json(['code' => $hash]);
     }
+
+    #[Route(
+        '/api/files/stop/sharing/{file}',
+        name: 'api_files_stop_sharing',
+        requirements: ['file' => '\d+'],
+        methods: ['POST']
+    )]
+    public function stopSharing(File $file): JsonResponse
+    {
+        if ($file->getUser()->getId() !== $this->getCurrentUser()->getId()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $file->setCode(null);
+        $file->setCodeCdate(null);
+
+        $this->entityManager->persist($file);
+        $this->entityManager->flush();
+
+        return $this->json([], Response::HTTP_NO_CONTENT);
+    }
 }

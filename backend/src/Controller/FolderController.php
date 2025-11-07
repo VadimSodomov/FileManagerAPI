@@ -199,4 +199,25 @@ final class FolderController extends BaseController
 
         return $this->json(['code' => $hash]);
     }
+
+    #[Route(
+        '/api/folder/stop/sharing/{folder}',
+        name: 'api_folder_stop_sharing',
+        requirements: ['folder' => '\d+'],
+        methods: ['POST']
+    )]
+    public function stopSharing(Folder $folder): JsonResponse
+    {
+        if ($folder->getUser()->getId() !== $this->getCurrentUser()->getId()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $folder->setCode(null);
+        $folder->setCodeCdate(null);
+
+        $this->entityManager->persist($folder);
+        $this->entityManager->flush();
+
+        return $this->json([], Response::HTTP_NO_CONTENT);
+    }
 }
