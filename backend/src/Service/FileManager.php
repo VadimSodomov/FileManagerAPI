@@ -55,6 +55,16 @@ readonly class FileManager
         }
     }
 
+    public function getFilePath(File $file): ?string
+    {
+        $filePath = $this->targetDirectory . '/' . $file->getServerName();
+
+        if (!file_exists($filePath)) {
+            return null;
+        }
+        return $filePath;
+    }
+
     public function getTargetDirectory(): string
     {
         return $this->targetDirectory;

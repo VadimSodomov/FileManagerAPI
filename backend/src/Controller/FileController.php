@@ -8,11 +8,15 @@ use App\Entity\File;
 use App\Entity\Folder;
 use App\Helper\HashHelper;
 use App\Repository\FileRepository;
+use App\Repository\FolderRepository;
 use App\Service\FileManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class FileController extends BaseController
@@ -21,6 +25,7 @@ final class FileController extends BaseController
         readonly private EntityManagerInterface $entityManager,
         readonly private FileManager            $fileManager,
         readonly private FileRepository         $fileRepository,
+        readonly private FolderRepository       $folderRepository,
     )
     {
     }
@@ -171,5 +176,46 @@ final class FileController extends BaseController
         $this->entityManager->flush();
 
         return $this->json([], Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route(
+        '/api/file/{file}',
+        name: 'api_file_view_download',
+        requirements: ['file' => '\d+'],
+        methods: ['GET']
+    )]
+    public function viewOrDownload(
+        File                         $file,
+        #[MapQueryParameter] string  $action,
+        #[MapQueryParameter] ?string $code,
+    ): BinaryFileResponse
+    {
+        $isAccessCode = !empty($code) && (
+                $file->getCode() === $code
+                || $this->folderRepository->getAccessPathByCode($file->getFolder()->getId(), $code) !== null
+            );
+
+        if ($file->getUser()->getId() !== $this->getCurrentUser()->getId() && !$isAccessCode) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $filePath = $this->fileManager->getFilePath($file);
+        if ($filePath === null) {
+            throw $this->createNotFoundException();
+        }
+
+        $response = new BinaryFileResponse($filePath);
+
+        if ($file->getMimeType() !== null) {
+            $response->headers->set('Content-Type', $file->getMimeType());
+        }
+
+        $disposition = $action === 'download'
+            ? ResponseHeaderBag::DISPOSITION_ATTACHMENT
+            : ResponseHeaderBag::DISPOSITION_INLINE;
+
+        $response->setContentDisposition($disposition, $file->getName());
+
+        return $response;
     }
 }
