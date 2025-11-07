@@ -155,12 +155,14 @@ final class FolderController extends BaseController
     ): JsonResponse
     {
         $accessPath = $code !== null ? $this->folderRepository->getAccessPathByCode($folder->getId(), $code) : null;
+        $isAuthor = $folder->getUser()->getId() === $this->getCurrentUser()->getId();
 
-        if (
-            $folder->getUser()->getId() !== $this->getCurrentUser()->getId()
-            && $accessPath === null
-        ) {
+        if (!$isAuthor && $accessPath === null) {
             throw $this->createAccessDeniedException();
+        }
+
+        if ($isAuthor) {
+            $accessPath = $this->folderRepository->getPathToRoot($folder->getId());
         }
 
         $childFolders = $this->folderRepository->findBy(['parent' => $folder]);

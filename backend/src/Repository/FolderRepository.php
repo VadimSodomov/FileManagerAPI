@@ -64,4 +64,49 @@ class FolderRepository extends ServiceEntityRepository
 
         return $result ? json_decode($result, true) : null;
     }
+
+    public function getPathToRoot(int $folderId): ?array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = <<<SQL
+        WITH RECURSIVE folder_path AS (
+            SELECT
+                id,
+                parent_id,
+                name,
+                code,
+                code_cdate,
+                JSONB_BUILD_ARRAY(
+                        JSONB_BUILD_OBJECT('id', id, 'name', name)
+                ) as path_objects,
+                1 as level
+            FROM folder
+            WHERE id = :folder_id
+            UNION ALL
+        
+            SELECT
+                f.id,
+                f.parent_id,
+                f.name,
+                f.code,
+                f.code_cdate,
+                JSONB_BUILD_ARRAY(
+                        JSONB_BUILD_OBJECT('id', f.id, 'name', f.name)
+                ) || fp.path_objects as path_objects,
+                fp.level + 1 as level
+            FROM folder f
+                     INNER JOIN folder_path fp ON f.id = fp.parent_id
+        )
+        SELECT
+            path_objects
+        FROM folder_path
+        ORDER BY level DESC
+        LIMIT 1;
+        SQL;
+
+        $result = $conn->executeQuery($sql, ['folder_id' => $folderId])->fetchOne();
+
+        return $result ? json_decode($result, true) : null;
+    }
 }
