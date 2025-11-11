@@ -29,13 +29,7 @@
                 </template>
             </QInput>
 
-            <div class="row items-center q-gutter-sm q-mt-sm">
-                <QCheckbox v-model="form.remember"
-                           label="Запомнить меня"
-                           dense />
-
-                <QSpace />
-
+            <div class="row items-center justify-end q-gutter-sm q-mt-sm">
                 <QBtn type="submit"
                       color="primary"
                       label="Войти"
@@ -60,7 +54,6 @@ const emit = defineEmits(['submit']);
 const form = ref({
     email: '',
     password: '',
-    remember: true,
 });
 
 const isShowPassword = ref(false);
