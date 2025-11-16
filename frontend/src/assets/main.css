@@ -1,8 +1,50 @@
-@import './base.css';
+:root {
+  /* синяя палитра */
+  --color-lightest: #E8F0FF;
+  --color-lighter: #C5D8FF;
+  --color-light: #9BC0FF;
+  --color-medium: #6B8EFF;
+  --color-dark: #4A7BFF;
+  --color-darkest: #2D5BCC;
+
+  /* желтая палитра */
+  --yellow-lightest: #FFF9E6;
+  --yellow-lighter: #FFF2CC;
+  --yellow-light: #FFE999;
+  --yellow-medium: #FFDF66;
+  --yellow-dark: #FFD633;
+  --yellow-darkest: #FFC300;
+
+  /* Градиенты синие */
+  --gradient-primary: linear-gradient(135deg, var(--color-dark) 0%, var(--color-medium) 100%);
+  --gradient-cloudy: linear-gradient(45deg, var(--color-light) 0%, var(--color-medium) 50%, var(--color-dark) 100%);
+  --gradient-electric: linear-gradient(45deg, #2D5BCC 0%, #4A7BFF 25%, #6B8EFF 50%, #8FB1FF 75%, #C5D8FF 100%);
+
+  /* Градиенты желтые */
+  --gradient-sunny: linear-gradient(135deg, var(--yellow-dark) 0%, var(--yellow-medium) 100%);
+  --gradient-gold: linear-gradient(45deg, var(--yellow-darkest) 0%, var(--yellow-dark) 50%, var(--yellow-medium) 100%);
+  --gradient-warm: linear-gradient(135deg, var(--yellow-light) 0%, var(--yellow-lightest) 100%);
+
+  /* Комбинированные градиенты */
+  --gradient-sunset: linear-gradient(135deg, var(--color-dark) 0%, var(--yellow-dark) 100%);
+  --gradient-ocean-sun: linear-gradient(45deg, var(--color-medium) 0%, var(--yellow-medium) 100%);
+
+  /* Текст */
+  --text-primary: #1A3A8B;
+  --text-secondary: #2D5BCC;
+  --text-yellow: #B38600;
+
+  /* Фоны */
+  --bg-white: #ffffff;
+  --bg-light: var(--color-lightest);
+  --bg-yellow-light: var(--yellow-lightest);
+  --bg-yellow-warm: var(--yellow-lighter);
+}
 
 #app {
-  max-width: 1420px;
-  margin: 0 auto;
-  padding: 1rem;
+  margin: 0;
+  padding: 0;
   font-weight: normal;
+  background: var(--bg-yellow-light);
+  color: var(--text-primary);
 }
