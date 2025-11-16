@@ -1,23 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import router from '@/router';
-import axios from 'axios';
-
-const API =  'http://127.0.0.1:8080/';
-
-const api = axios.create({
-    baseURL: API,
-    withCredentials: false,
-});
-
-const setAuthHeader = (token) => {
-    if (token) {
-        api.defaults.headers.common.Authorization = `Bearer ${token}`;
-    }
-    else {
-        delete api.defaults.headers.common.Authorization;
-    }
-};
+import api from '../../index.js';
 
 export const useAuthStore = defineStore('authentication', () => {
     const user = ref(null);
@@ -32,7 +16,6 @@ export const useAuthStore = defineStore('authentication', () => {
         } catch {
             user.value = null;
         }
-        setAuthHeader(token.value);
     };
 
     const setSession = (jwt, userData) => {
@@ -41,7 +24,6 @@ export const useAuthStore = defineStore('authentication', () => {
 
         localStorage.setItem('jwt_token', jwt);
         localStorage.setItem('auth_user', JSON.stringify(userData));
-        setAuthHeader(jwt);
     };
 
     const clearSession = () => {
@@ -50,7 +32,6 @@ export const useAuthStore = defineStore('authentication', () => {
 
         localStorage.removeItem('jwt_token');
         localStorage.removeItem('auth_user');
-        setAuthHeader(null);
     };
 
     const getAxiosMessage = (err) =>
