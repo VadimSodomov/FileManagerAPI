@@ -1,5 +1,8 @@
 <template>
-    <div class="row items-center justify-center vh-100">
+    <div class="auth-container">
+      <div class="main-title">
+        cloudy
+      </div>
         <QCard class="auth-card">
             <QCardSection class="auth-card__section">
                 <QTabs class="q-ma-md"
@@ -85,15 +88,25 @@ const onReg = async (payload) => {
 </script>
 
 <style scoped>
-.vh-100 {
-    min-height: 100vh;
+.auth-container {
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-yellow-light);
+    box-sizing: border-box;
+    padding: 0;
 }
 
 .auth-card {
     width: 100%;
     max-width: 450px;
     height: 390px;
-    border-radius: 10px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: white;
 }
 
 .auth-card__section {
@@ -113,5 +126,18 @@ const onReg = async (payload) => {
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.main-title {
+    font-size: 4rem;
+    font-weight: 800;
+    background: var(--gradient-cloudy);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    margin-bottom: 2rem;
+    letter-spacing: 3px;
+    text-shadow: 0 4px 15px rgba(74, 123, 255, 0.2);
 }
 </style>
